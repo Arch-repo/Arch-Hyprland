@@ -170,6 +170,99 @@ clone_or_update_repo() {
     fi
 }
 
+pick_largest_resolution() {
+    awk '
+        function consider(value, parts, width, height, area) {
+            sub(/@.*/, "", value)
+
+            if (value !~ /^[0-9]+x[0-9]+$/) {
+                return
+            }
+
+            split(value, parts, "x")
+            width = parts[1] + 0
+            height = parts[2] + 0
+            area = width * height
+
+            if (area > best_area) {
+                best_area = area
+                best = width "x" height
+            }
+        }
+
+        {
+            for (i = 1; i <= NF; i++) {
+                consider($i)
+            }
+        }
+
+        END {
+            if (best != "") {
+                print best
+            } else {
+                exit 1
+            }
+        }
+    '
+}
+
+detect_display_resolution() {
+    local resolution
+    local mode_file
+    local status_file
+
+    if command -v hyprctl >/dev/null 2>&1; then
+        resolution="$(
+            hyprctl monitors 2>/dev/null |
+                awk '/^[[:space:]]*[0-9]+x[0-9]+@/ { split($1, mode, "@"); print mode[1] }' |
+                pick_largest_resolution 2>/dev/null || true
+        )"
+
+        if [[ "$resolution" =~ ^[0-9]+x[0-9]+$ ]]; then
+            printf '%s\n' "$resolution"
+            return 0
+        fi
+    fi
+
+    if command -v xrandr >/dev/null 2>&1; then
+        resolution="$(
+            xrandr --query 2>/dev/null |
+                awk '
+                    / connected/ { connected = 1; next }
+                    /^[^[:space:]]/ { connected = 0 }
+                    connected && /\*/ { print $1 }
+                ' |
+                pick_largest_resolution 2>/dev/null || true
+        )"
+
+        if [[ "$resolution" =~ ^[0-9]+x[0-9]+$ ]]; then
+            printf '%s\n' "$resolution"
+            return 0
+        fi
+    fi
+
+    resolution="$(
+        for mode_file in /sys/class/drm/card*-*/modes; do
+            [[ -r "$mode_file" ]] || continue
+
+            status_file="${mode_file%/modes}/status"
+            if [[ -r "$status_file" && "$(<"$status_file")" != "connected" ]]; then
+                continue
+            fi
+
+            cat "$mode_file"
+        done |
+            pick_largest_resolution 2>/dev/null || true
+    )"
+
+    if [[ "$resolution" =~ ^[0-9]+x[0-9]+$ ]]; then
+        printf '%s\n' "$resolution"
+        return 0
+    fi
+
+    return 1
+}
+
 install_dotfiles_repo() {
     clone_or_update_repo "$DOTFILES_REPO" "$DOTFILES_DIR"
 }
@@ -198,11 +291,22 @@ install_anto426_grub_theme() {
     (
         cd "$GRUB_THEME_BUILD_DIR"
         local grub_args=(-t anto426 -i color)
+        local grub_resolution="${ANTO426_GRUB_RESOLUTION:-}"
+        local grub_screen="${ANTO426_GRUB_SCREEN:-}"
 
-        if [[ -n "${ANTO426_GRUB_RESOLUTION:-}" ]]; then
-            grub_args+=(-c "$ANTO426_GRUB_RESOLUTION")
+        if [[ -n "$grub_resolution" ]]; then
+            grub_args+=(-c "$grub_resolution")
+            ui_note "Using GRUB resolution override: $grub_resolution"
+        elif [[ -n "$grub_screen" ]]; then
+            grub_args+=(-s "$grub_screen")
+            ui_note "Using GRUB screen override: $grub_screen"
+        elif grub_resolution="$(detect_display_resolution)"; then
+            grub_args+=(-c "$grub_resolution")
+            ui_note "Detected GRUB display resolution: $grub_resolution"
         else
-            grub_args+=(-s "${ANTO426_GRUB_SCREEN:-1080p}")
+            grub_screen="1080p"
+            grub_args+=(-s "$grub_screen")
+            ui_warn "Could not detect display resolution, falling back to GRUB 1080p theme."
         fi
 
         if [[ "${ANTO426_GRUB_BOOT:-0}" == "1" ]]; then
@@ -211,12 +315,13 @@ install_anto426_grub_theme() {
 
         if [[ -f ./install-anto426.sh ]]; then
             local sudo_env=(
-                "ANTO426_GRUB_SCREEN=${ANTO426_GRUB_SCREEN:-1080p}"
                 "ANTO426_GRUB_BOOT=${ANTO426_GRUB_BOOT:-0}"
             )
 
-            if [[ -n "${ANTO426_GRUB_RESOLUTION:-}" ]]; then
-                sudo_env+=("ANTO426_GRUB_RESOLUTION=$ANTO426_GRUB_RESOLUTION")
+            if [[ -n "$grub_resolution" ]]; then
+                sudo_env+=("ANTO426_GRUB_RESOLUTION=$grub_resolution")
+            else
+                sudo_env+=("ANTO426_GRUB_SCREEN=$grub_screen")
             fi
 
             sudo env "${sudo_env[@]}" bash ./install-anto426.sh

@@ -68,7 +68,7 @@ ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
 
 - 🖌️ **GTK Base Theme**: Installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
 - 🗂️ **GRUB Theme**: Installed from [`grub2-themes`](https://github.com/Anto426/grub2-themes), a single `anto426` theme aligned with the Riva controls.
-  - You can customize before running `install.sh` if the default 1080p layout is not right for your machine:
+  - The Arch installer auto-detects the active display resolution for GRUB. You can still override it before running `install.sh`:
     - `ANTO426_GRUB_SCREEN=2k` or `4k`
     - `ANTO426_GRUB_RESOLUTION=3440x1440` (for custom ultrawide)
 
