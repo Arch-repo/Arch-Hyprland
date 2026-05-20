@@ -96,7 +96,7 @@ pacman_packages=(
     pipewire pipewire-pulse wireplumber pavucontrol
 
     # Apps used by the dotfiles
-    ghostty nemo gvfs curl jq python loupe celluloid gnome-text-editor evince
+    ghostty nemo gvfs curl jq python python-gobject gtk3 gtk-layer-shell loupe celluloid gnome-text-editor evince
     ffmpeg cava cliphist gnome-characters keepass playerctl wev
 
     # Qt, display manager, and theming
