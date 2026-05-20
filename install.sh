@@ -52,7 +52,7 @@ pacman_packages=(
 
 aur_packages=(
     # Desktop shell extras
-    wlogout sddm-astronaut-theme apple_cursor whitesur-icon-theme tint
+    wlogout sddm-sugar-candy-git apple_cursor whitesur-icon-theme tint
     gtk-engine-murrine
 
     # Browsers and editors
@@ -168,6 +168,39 @@ install_anto426_grub_theme() {
 setup_dynamic_theme_permissions() {
     if [[ -x "$ANTO_CONFIG_DIR/wallpaper_effects.sh" ]]; then
         sudo ANTO426_ADMIN_USER="$(id -un)" "$ANTO_CONFIG_DIR/wallpaper_effects.sh" --setup-admin || true
+    fi
+}
+
+configure_sddm() {
+    local theme_name="${ANTO426_SDDM_THEME:-sugar-candy}"
+    local theme_dir="/usr/share/sddm/themes/$theme_name"
+    local config_file="/etc/sddm.conf.d/10-anto426-theme.conf"
+    local active_display_manager
+
+    if [[ ! -d "$theme_dir" ]]; then
+        echo -e "${BLUE}[NOTE]${PINK} ==> SDDM theme '$theme_name' not found. Check that sddm-sugar-candy-git installed correctly."
+    else
+        sudo install -d -m 755 /etc/sddm.conf.d
+        sudo tee "$config_file" >/dev/null <<EOF
+[Theme]
+Current=$theme_name
+CursorTheme=macOS
+Font=Segoe UI Variable Static Text
+EOF
+        echo -e "${GREEN}[OK]${PINK} ==> SDDM theme set to '$theme_name'."
+    fi
+
+    active_display_manager="$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null || true)"
+
+    if [[ -z "$active_display_manager" ]]; then
+        sudo systemctl enable sddm.service
+        echo -e "${GREEN}[OK]${PINK} ==> SDDM has been enabled."
+    elif [[ "$active_display_manager" == */sddm.service ]]; then
+        sudo systemctl enable sddm.service >/dev/null 2>&1 || true
+        echo -e "${GREEN}[OK]${PINK} ==> SDDM is already the active display manager."
+    else
+        echo -e "${BLUE}[NOTE]${PINK} ==> Another display manager is active: $active_display_manager"
+        echo -e "${BLUE}[NOTE]${PINK} ==> Leaving it enabled. Run 'sudo systemctl disable --now display-manager && sudo systemctl enable sddm' to switch manually."
     fi
 }
 
@@ -310,14 +343,9 @@ cd "$DOTFILES_DIR"
 stow -t ~ .
 cd ~
 
-# Check display manager
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[11/11]${PINK} ==> Check display manager\n---------------------------------------------------------------------\n${WHITE}"
-if [[ ! -e /etc/systemd/system/display-manager.service ]]; then
-    sudo systemctl enable sddm
-    echo -e "[Theme]\nCurrent=sddm-astronaut-theme" | sudo tee -a /etc/sddm.conf
-    sudo sed -i 's|astronaut.conf|purple_leaves.conf|' /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop
-    echo -e "\n${PINK}SDDM has been enabled."
-fi
+# Setup display manager
+echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[11/11]${PINK} ==> Setup SDDM display manager\n---------------------------------------------------------------------\n${WHITE}"
+configure_sddm
 
 # Wait a little just for the last message
 sleep 0.7
