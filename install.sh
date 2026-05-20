@@ -96,7 +96,7 @@ pacman_packages=(
     pipewire pipewire-pulse wireplumber pavucontrol
 
     # Apps used by the dotfiles
-    ghostty nemo gvfs curl jq python python-gobject gtk3 loupe celluloid gnome-text-editor evince
+    ghostty nemo gvfs curl jq python python-gobject gtk3 htop loupe celluloid gnome-text-editor evince
     ffmpeg cava cliphist gnome-characters keepass playerctl wev
 
     # Qt, display manager, and theming
@@ -109,12 +109,17 @@ pacman_packages=(
     # Fonts and image libraries
     ttf-jetbrains-mono-nerd noto-fonts noto-fonts-emoji
     libvips libheif openslide poppler-glib imagemagick grub
+
+    # Build dependencies for Anto426 rofi with slider support
+    stow meson ninja pkgconf flex bison check pandoc doxygen
+    glib2 cairo pango gdk-pixbuf2 startup-notification
+    libxkbcommon libxcb xcb-util xcb-util-wm xcb-util-cursor xcb-util-keysyms xcb-imdkit
+    wayland wayland-protocols
 )
 
 aur_packages=(
     # Desktop shell extras
     wlogout sddm-sugar-candy-git apple_cursor whitesur-icon-theme tint
-    gtk-engine-murrine
 
     # Browsers and editors
     brave-bin zen-browser-bin visual-studio-code-bin sublime-text-4
@@ -142,6 +147,48 @@ install_hyprland_packages() {
     sudo pacman -S --needed --noconfirm "${pacman_packages[@]}"
     ensure_yay
     yay -S --needed --noconfirm "${aur_packages[@]}"
+}
+
+build_anto426_rofi() {
+    if [[ "${ANTO426_SKIP_ROFI_BUILD:-0}" == "1" ]]; then
+        echo -e "${BLUE}[NOTE]${PINK} ==> Skipping Anto426 rofi build."
+        return 0
+    fi
+
+    local rofi_src="${ANTO426_ROFI_SRC:-$HOME/Git/arch/rofi}"
+    local rofi_repo="${ANTO426_ROFI_REPO:-https://github.com/Anto426/rofi}"
+    local build_dir="${ANTO426_ROFI_BUILD_DIR:-$rofi_src/build-anto426}"
+    local prefix="${ANTO426_ROFI_PREFIX:-$HOME/.local/rofi-anto426}"
+
+    if [[ ! -d "$rofi_src/.git" ]]; then
+        echo -e "${BLUE}[NOTE]${PINK} ==> Cloning Anto426 rofi into $rofi_src"
+        mkdir -p "$(dirname "$rofi_src")"
+        git clone --recursive "$rofi_repo" "$rofi_src"
+    else
+        echo -e "${BLUE}[NOTE]${PINK} ==> Using existing Anto426 rofi checkout: $rofi_src"
+        (
+            cd "$rofi_src"
+            git submodule update --init --recursive
+        )
+    fi
+
+    if [[ ! -f "$build_dir/build.ninja" ]]; then
+        meson setup "$build_dir" "$rofi_src" --prefix "$prefix"
+    else
+        meson setup --reconfigure "$build_dir" "$rofi_src" --prefix "$prefix"
+    fi
+
+    meson compile -C "$build_dir"
+    meson install -C "$build_dir"
+
+    mkdir -p "$HOME/.local/bin"
+    ln -sfn "$prefix/bin/rofi" "$HOME/.local/bin/rofi"
+
+    if "$HOME/.local/bin/rofi" -help 2>&1 | grep -Fq -- "-slider-change-command"; then
+        echo -e "${GREEN}[OK]${PINK} ==> Anto426 rofi installed with slider support."
+    else
+        echo -e "${BLUE}[NOTE]${PINK} ==> Anto426 rofi installed, but slider dmenu option was not detected."
+    fi
 }
 
 clone_or_update_repo() {
@@ -394,6 +441,21 @@ EOF
     fi
 }
 
+configure_power_button_policy() {
+    local logind_dir="/etc/systemd/logind.conf.d"
+    local logind_file="$logind_dir/10-anto426-power-button.conf"
+
+    sudo install -d -m 755 "$logind_dir"
+    printf '%s\n' \
+        '[Login]' \
+        'HandlePowerKey=ignore' \
+        'HandlePowerKeyLongPress=ignore' |
+        sudo tee "$logind_file" >/dev/null
+
+    sudo systemctl restart systemd-logind.service || true
+    ui_ok "Power button configured to avoid accidental shutdown."
+}
+
 run_auto_setup() {
     local setup_script
     setup_script="$(mktemp)"
@@ -480,6 +542,7 @@ init_dotfiles_sync_config
 ui_step 5 11 "Installing packages and themes"
 sleep 0.5
 install_hyprland_packages
+build_anto426_rofi
 install_anto426_theme
 install_anto426_grub_theme
 setup_dynamic_theme_permissions
@@ -490,6 +553,7 @@ ui_step 6 11 "Enabling Bluetooth and NetworkManager"
 sleep 0.5
 sudo systemctl enable --now bluetooth
 sudo systemctl enable --now NetworkManager
+configure_power_button_policy
 
 # Set Ghostty as default terminal emulator for Nemo
 ui_step 7 11 "Setting Ghostty as Nemo terminal"

@@ -32,6 +32,7 @@ A beautiful, automated installer to deploy a complete Wayland/Hyprland desktop e
 > [!NOTE]
 > This script does not include package uninstallation, as some packages may already exist on your system by default. Creating an uninstallation script could potentially affect your current setup.
 > Non-essential entertainment apps are not installed by the base setup.
+> The installer also sets the physical power button to be ignored by systemd-logind to avoid accidental shutdowns.
 
 ### ⌨️ Keybinding Hint
 Press `SUPER + H` (Windows + H) to open the interactive keybinding hints.
@@ -60,6 +61,7 @@ DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
 WALLPAPER_REPO=https://github.com/Anto426/Wallpaper-Collection.git
 ANTO_THEME_REPO=https://github.com/Anto426/Anto426-theme.git
 ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
+ANTO426_ROFI_REPO=https://github.com/Anto426/rofi
 ```
 
 ---
@@ -67,6 +69,7 @@ ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
 ## 🎨 Theme Repos
 
 - 🖌️ **GTK Base Theme**: Installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
+- 🎛️ **Custom Rofi**: Installed from [`rofi`](https://github.com/Anto426/rofi) so the control menus can use the slider widget.
 - 🗂️ **GRUB Theme**: Installed from [`grub2-themes`](https://github.com/Anto426/grub2-themes), a single `anto426` theme aligned with the Riva controls.
   - The Arch installer auto-detects the active display resolution for GRUB. You can still override it before running `install.sh`:
     - `ANTO426_GRUB_SCREEN=2k` or `4k`
