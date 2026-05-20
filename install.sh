@@ -1,18 +1,79 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Variables
-#----------------------------
-
-# time variable
 start=$(date +%s)
 
-# Color variables
+RESET="\e[0m"
+BOLD="\e[1m"
+DIM="\e[2m"
 PINK="\e[35m"
-WHITE="\e[0m"
+WHITE="$RESET"
 YELLOW="\e[33m"
 GREEN="\e[32m"
 BLUE="\e[34m"
+CYAN="\e[36m"
+
+ui_line() {
+    printf '%b\n' "${PINK}---------------------------------------------------------------------${RESET}"
+}
+
+ui_banner() {
+    clear
+    printf '%b\n' "${PINK}${BOLD}"
+    printf '  ANTO426 ARCH HYPRLAND SETUP\n'
+    printf '%b\n' "${RESET}${DIM}  Complete Wayland desktop install for Arch-based systems.${RESET}"
+    ui_line
+}
+
+ui_step() {
+    local current="$1"
+    local total="$2"
+    local title="$3"
+
+    printf '\n'
+    ui_line
+    printf '%b[%02d/%02d]%b %b%s%b\n' "$YELLOW" "$current" "$total" "$RESET" "$BOLD" "$title" "$RESET"
+    ui_line
+}
+
+ui_ok() {
+    printf '%b[OK]%b %s\n' "$GREEN" "$RESET" "$*"
+}
+
+ui_note() {
+    printf '%b[NOTE]%b %s\n' "$BLUE" "$RESET" "$*"
+}
+
+ui_warn() {
+    printf '%b[WARN]%b %s\n' "$YELLOW" "$RESET" "$*"
+}
+
+ui_error() {
+    printf '%b[ERROR]%b %s\n' "$YELLOW" "$RESET" "$*"
+}
+
+ui_confirm() {
+    printf '%b\n' "${YELLOW}This script will modify your system, install packages, enable services, and stow dotfiles.${RESET}"
+    printf '%b' "${YELLOW}Continue with the Hyprland installation? [y/N]: ${RESET}"
+}
+
+ui_done() {
+    local duration="$1"
+    local hours="$2"
+    local minutes="$3"
+    local seconds="$4"
+
+    clear
+    printf '%b\n' "${PINK}${BOLD}"
+    printf '  HYPRLAND SETUP COMPLETE\n'
+    printf '%b\n' "$RESET"
+    ui_line
+    printf '  Duration: %s hours, %s minutes, %s seconds\n' "$hours" "$minutes" "$seconds"
+    printf '  Total seconds: %s\n' "$duration"
+    printf '  Recommended next step: reboot to apply all services and themes.\n'
+    ui_line
+    printf '\n'
+}
 
 AUTO_SETUP_URL="${AUTO_SETUP_URL:-https://raw.githubusercontent.com/Anto426/auto-setup-LT/main/arch.sh}"
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Anto426/dotfiles.git}"
@@ -96,13 +157,13 @@ clone_or_update_repo() {
         else
             local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
             mv "$target" "$backup"
-            echo -e "${BLUE}[NOTE]${PINK} ==> Existing $target remote differs, moved to $backup"
+            ui_note "Existing $target remote differs, moved to $backup"
             git clone --depth 1 "$repo" "$target"
         fi
     elif [[ -e "$target" ]]; then
         local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
         mv "$target" "$backup"
-        echo -e "${BLUE}[NOTE]${PINK} ==> Existing $target moved to $backup"
+        ui_note "Existing $target moved to $backup"
         git clone --depth 1 "$repo" "$target"
     else
         git clone --depth 1 "$repo" "$target"
@@ -130,7 +191,7 @@ install_anto426_grub_theme() {
     clone_or_update_repo "$ANTO_GRUB_THEME_REPO" "$GRUB_THEME_BUILD_DIR"
 
     if [[ ! -f /etc/default/grub ]] || { [[ ! -d /boot/grub ]] && [[ ! -d /boot/grub2 ]]; }; then
-        echo -e "${BLUE}[NOTE]${PINK} ==> Active GRUB installation not found, skipping GRUB theme install."
+        ui_note "Active GRUB installation not found, skipping GRUB theme install."
         return 0
     fi
 
@@ -178,7 +239,7 @@ configure_sddm() {
     local active_display_manager
 
     if [[ ! -d "$theme_dir" ]]; then
-        echo -e "${BLUE}[NOTE]${PINK} ==> SDDM theme '$theme_name' not found. Check that sddm-sugar-candy-git installed correctly."
+        ui_note "SDDM theme '$theme_name' not found. Check that sddm-sugar-candy-git installed correctly."
     else
         sudo install -d -m 755 /etc/sddm.conf.d
         sudo tee "$config_file" >/dev/null <<EOF
@@ -187,20 +248,20 @@ Current=$theme_name
 CursorTheme=macOS
 Font=Segoe UI Variable Static Text
 EOF
-        echo -e "${GREEN}[OK]${PINK} ==> SDDM theme set to '$theme_name'."
+        ui_ok "SDDM theme set to '$theme_name'."
     fi
 
     active_display_manager="$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null || true)"
 
     if [[ -z "$active_display_manager" ]]; then
         sudo systemctl enable sddm.service
-        echo -e "${GREEN}[OK]${PINK} ==> SDDM has been enabled."
+        ui_ok "SDDM has been enabled."
     elif [[ "$active_display_manager" == */sddm.service ]]; then
         sudo systemctl enable sddm.service >/dev/null 2>&1 || true
-        echo -e "${GREEN}[OK]${PINK} ==> SDDM is already the active display manager."
+        ui_ok "SDDM is already the active display manager."
     else
-        echo -e "${BLUE}[NOTE]${PINK} ==> Another display manager is active: $active_display_manager"
-        echo -e "${BLUE}[NOTE]${PINK} ==> Leaving it enabled. Run 'sudo systemctl disable --now display-manager && sudo systemctl enable sddm' to switch manually."
+        ui_note "Another display manager is active: $active_display_manager"
+        ui_note "Leaving it enabled. Run 'sudo systemctl disable --now display-manager && sudo systemctl enable sddm' to switch manually."
     fi
 }
 
@@ -215,7 +276,7 @@ run_auto_setup() {
 
 ensure_dotfiles_ready() {
     if [[ ! -d "$ANTO_CONFIG_DIR" ]]; then
-        echo -e "${BLUE}[ERROR]${PINK} ==> Dotfiles config directory not found: $ANTO_CONFIG_DIR"
+        ui_error "Dotfiles config directory not found: $ANTO_CONFIG_DIR"
         exit 1
     fi
 }
@@ -249,35 +310,16 @@ init_dotfiles_sync_config() {
 }
 
 
-clear
-
-# Welcome message
-echo -e "${PINK}\e[1m
- WELCOME!${PINK} Now we will install and setup Hyprland on an Arch-based system
-                       Created by \e[1;4manto426
-${WHITE}"
-
-# Warning message
-echo -e "${PINK}
- *********************************************************************
- *                         ⚠️  \e[1;4mWARNING\e[0m${PINK}:                              *
- *               This script will modify your system!                *
- *         It will install Hyprland and several dependencies.        *
- *      Make sure you know what you are doing before continuing.     *
- *********************************************************************
-\n
-"
-
-# Asking if the user want to proceed
-echo -e "${YELLOW} Do you still want to continue with Hyprland installation using this script? [y/N]: \n"
+ui_banner
+ui_confirm
 read -r confirm
 case "$confirm" in
     [yY][eE][sS]|[yY])
-        echo -e "\n${GREEN}[OK]${PINK} ==> Continuing with installation..."
+        printf '\n'
+        ui_ok "Continuing with installation."
         ;;
     *)
-        echo -e "${BLUE}[NOTE]${PINK} ==> You 🫵 chose ${YELLOW}NOT${PINK} to proceed.. Exiting..."
-        echo
+        ui_note "Installation cancelled by user."
         exit 1
         ;;
 esac
@@ -286,27 +328,27 @@ esac
 cd ~
 
 # Full system update
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[1/11]${PINK} ==> Updating system packages\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 1 11 "Updating system packages"
 sudo pacman -Syu --noconfirm
 
 # Launch auto-setup script and download all the dotfiles
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[2/11]${PINK} ==> Setup terminal\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 2 11 "Setting up terminal and dotfiles"
 sleep 0.5
 run_auto_setup
 install_dotfiles_repo
 ensure_dotfiles_ready
 
 # Make all dotfiles scripts executable
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[3/11]${PINK} ==> Make executable\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 3 11 "Making dotfiles scripts executable"
 find "$ANTO_CONFIG_DIR" -type f -name "*.sh" -exec chmod +x {} +
 
 # Download wallpapers and terminal images
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[4/11]${PINK} ==> Download wallpaper\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 4 11 "Downloading wallpapers and terminal assets"
 install_assets
 init_dotfiles_sync_config
 
 # Install the required packages
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[5/11]${PINK} ==> Install package\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 5 11 "Installing packages and themes"
 sleep 0.5
 install_hyprland_packages
 install_anto426_theme
@@ -315,43 +357,40 @@ setup_dynamic_theme_permissions
 "$ANTO_CONFIG_DIR/gtkthemes.sh" || true
 
 # enable bluetooth & networkmanager
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[6/11]${PINK} ==> Enable bluetooth & networkmanager\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 6 11 "Enabling Bluetooth and NetworkManager"
 sleep 0.5
 sudo systemctl enable --now bluetooth
 sudo systemctl enable --now NetworkManager
 
 # Set Ghostty as default terminal emulator for Nemo
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[7/11]${PINK} ==> Set Ghostty as the default terminal emulator for Nemo\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 7 11 "Setting Ghostty as Nemo terminal"
 if command -v gsettings >/dev/null 2>&1 &&
     [[ "$(gsettings writable org.cinnamon.desktop.default-applications.terminal exec 2>/dev/null)" == "true" ]]; then
     gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty
 else
-    echo -e "${BLUE}[NOTE]${PINK} ==> Nemo terminal schema not available, skipping."
+    ui_note "Nemo terminal schema not available, skipping."
 fi
 
 # Apply fonts
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[8/11]${PINK} ==> Apply fonts\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 8 11 "Refreshing font cache"
 fc-cache -fv
 
 # Set cursor
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[9/11]${PINK} ==> Set cursor\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 9 11 "Applying cursor theme"
 "$ANTO_CONFIG_DIR/setcursor.sh"
 
 # Stow
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[10/11]${PINK} ==> Stow dotfiles\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 10 11 "Stowing dotfiles"
 cd "$DOTFILES_DIR"
 stow -t ~ .
 cd ~
 
 # Setup display manager
-echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[11/11]${PINK} ==> Setup SDDM display manager\n---------------------------------------------------------------------\n${WHITE}"
+ui_step 11 11 "Configuring SDDM display manager"
 configure_sddm
 
 # Wait a little just for the last message
 sleep 0.7
-clear
-
-# Calculate how long the script took
 end=$(date +%s)
 duration=$((end - start))
 
@@ -362,15 +401,4 @@ seconds=$((duration % 60))
 printf -v minutes "%02d" "$minutes"
 printf -v seconds "%02d" "$seconds"
 
-echo -e "\n
- *********************************************************************
- *                    Hyprland setup is complete!                    *
- *                                                                   *
- *             Duration : $hours hours, $minutes minutes, $seconds seconds            *
- *                                                                   *
- *   It is recommended to \e[1;4mREBOOT\e[0m your system to apply all changes.   *
- *                                                                   *
- *                 \e[4mHave a great time with Hyprland!!${WHITE}                 *
- *********************************************************************
- \n
-"
+ui_done "$duration" "$hours" "$minutes" "$seconds"
