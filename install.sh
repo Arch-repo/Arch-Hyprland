@@ -232,6 +232,30 @@ setup_dynamic_theme_permissions() {
     fi
 }
 
+configure_hyprland_session() {
+    local session_dir="/usr/share/wayland-sessions"
+    local session_file="$session_dir/hyprland.desktop"
+
+    if [[ ! -x /usr/bin/start-hyprland ]]; then
+        ui_note "start-hyprland not found, skipping Hyprland session rewrite."
+        return 0
+    fi
+
+    sudo install -d -m 755 "$session_dir"
+    sudo tee "$session_file" >/dev/null <<'EOF'
+[Desktop Entry]
+Name=Hyprland
+Comment=An intelligent dynamic tiling Wayland compositor
+Exec=/usr/bin/start-hyprland
+TryExec=/usr/bin/start-hyprland
+Type=Application
+DesktopNames=Hyprland
+Keywords=tiling;wayland;compositor;
+EOF
+
+    ui_ok "Hyprland session now starts through start-hyprland."
+}
+
 configure_sddm() {
     local theme_name="${ANTO426_SDDM_THEME:-sugar-candy}"
     local theme_dir="/usr/share/sddm/themes/$theme_name"
@@ -387,6 +411,7 @@ cd ~
 
 # Setup display manager
 ui_step 11 11 "Configuring SDDM display manager"
+configure_hyprland_session
 configure_sddm
 
 # Wait a little just for the last message
