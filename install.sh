@@ -39,7 +39,7 @@ pacman_packages=(
     ffmpeg cava cliphist gnome-characters keepass
 
     # Qt, display manager, and theming
-    sddm qt5ct qt6ct qt5-wayland qt6-wayland nwg-look adw-gtk-theme kvantum-qt5
+    sddm qt5ct qt6ct qt5-wayland qt6-wayland nwg-look kvantum kvantum-qt5
     sassc gnome-themes-extra
 
     # Input method
