@@ -18,7 +18,7 @@ AUTO_SETUP_URL="${AUTO_SETUP_URL:-https://raw.githubusercontent.com/Anto426/auto
 DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Anto426/dotfiles.git}"
 WALLPAPER_REPO="${WALLPAPER_REPO:-https://github.com/Anto426/Wallpaper-Collection.git}"
 ANTO_THEME_REPO="${ANTO_THEME_REPO:-https://github.com/Anto426/Anto426-theme.git}"
-ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Anto426/Anto426-grub-theme.git}"
+ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Anto426/grub2-themes.git}"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 ANTO_CONFIG_DIR="$DOTFILES_DIR/.config/anto426"
 THEME_BUILD_DIR="${THEME_BUILD_DIR:-$HOME/.cache/anto426-theme}"
@@ -53,6 +53,7 @@ pacman_packages=(
 aur_packages=(
     # Desktop shell extras
     wlogout sddm-astronaut-theme apple_cursor whitesur-icon-theme tint
+    gtk-engine-murrine
 
     # Browsers and editors
     brave-bin zen-browser-bin visual-studio-code-bin sublime-text-4

@@ -1,83 +1,92 @@
-# My Arch-Hyprland
+<div align="center">
 
-## Table of Contents
-- [Preview](#preview)
-    - [Videos](#videos)
-    - [Screenshots](#screenshots)
-- [Notes](#notes)
-    - [Keybinding](#keybinding)
-- [Installation](#installation)
-- [Dotfiles Repo](#dotfiles-repo)
-- [Wallpapers Repo](#wallpapers-repo)
-- [Theme Repos](#theme-repos)
-- [Inspirations](#inspirations)
+# 🚀 anto426 Arch-Hyprland
 
-## Preview
-### Videos
-[▶️ Watch on YouTube](https://youtu.be/j_eCc8s1v3M)
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=28&duration=3000&pause=1000&color=8cb8e4&center=true&vCenter=true&width=435&lines=Arch+Hyprland+Setup;Aesthetic+Wayland+Install;Automatic+Deployment)](https://git.io/typing-svg)
 
-<https://github.com/user-attachments/assets/8fc6831a-26cc-4415-8005-a533fa1bfb72>
+A beautiful, automated installer to deploy a complete Wayland/Hyprland desktop ecosystem on Arch Linux.
 
-### Screenshots
-<p align="center">
-    <img src="https://github.com/user-attachments/assets/a004c50a-4001-4596-a48e-97ecc9997843" alt="Image-1.png" width="49%"/>
-    <img src="https://github.com/user-attachments/assets/5d59431c-de0c-487d-bc1a-ea4b2828787a" alt="Image-2.png" width="49%"/>
-    <img src="https://github.com/user-attachments/assets/b2b0674f-4709-40d3-bfbe-9c5c5660bf3b" alt="Image-3.png" width="49%"/>
-    <img src="https://github.com/user-attachments/assets/c55950ed-8e7b-4e10-bde3-dd445fbc388b" alt="Image-4.png" width="49%"/>
-</p>
+</div>
 
-## Notes
+---
+
+## ✨ Preview
+
+> [!NOTE]
+> Previews, screenshots, and setup demonstration videos are currently **to be uploaded** (*ancora da caricare*).
+
+### 📽️ Videos
+- ⏳ *Demo video coming soon (to be uploaded)*
+
+### 📸 Screenshots
+- ⏳ *Setup screenshots coming soon (to be uploaded)*
+
+---
+
+## 📝 Important Notes
+
 > [!IMPORTANT]
-> `This script automates the installation and setup of my Arch Hyprland environment.`
+> This script automates the installation and setup of my Arch Hyprland environment.
 > - If you want to try it, you should use a minimal profile and backup your system beforehand.
 
 > [!NOTE]
 > This script does not include package uninstallation, as some packages may already exist on your system by default. Creating an uninstallation script could potentially affect your current setup.
 > Non-essential entertainment apps are not installed by the base setup.
 
-### Keybinding
-`SUPER + H` (Windows + H) to open keybinding hints.
+### ⌨️ Keybinding Hint
+Press `SUPER + H` (Windows + H) to open the interactive keybinding hints.
 
-## Installation
-Use this script to install Hyprland on an Arch-based system:
-``` bash
+---
+
+## ⚙️ Installation
+
+Use this script to install Hyprland on a clean Arch-based system:
+
+```bash
 git clone --depth=1 https://github.com/Anto426/Arch-Hyprland.git
 cd ~/Arch-Hyprland
 chmod +x install.sh
 ./install.sh
 ```
 
-## Dotfiles Repo
-This repo contains all my dotfiles: [`dotfiles`](https://github.com/Anto426/dotfiles).
+---
 
-## Wallpapers Repo
-You can find the desktop wallpapers and Fastfetch terminal images in: [`Wallpaper-Collection`](https://github.com/Anto426/Wallpaper-Collection).
+## 📂 Repository Variables
 
-The installer copies `Wallpapers/` to `~/Pictures/Wallpapers` and `neofetch/` to `~/Pictures/neofetch`. You can later point the dotfiles sync config to Google Drive or another local folder via `~/.local/share/anto426/sync.env`.
-
-## Theme Repos
 The installer uses these repo variables and checks that existing cached clones point to the expected remote before pulling:
 
 ```bash
 DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
 WALLPAPER_REPO=https://github.com/Anto426/Wallpaper-Collection.git
 ANTO_THEME_REPO=https://github.com/Anto426/Anto426-theme.git
-ANTO_GRUB_THEME_REPO=https://github.com/Anto426/Anto426-grub-theme.git
+ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
 ```
 
-The GTK base theme is installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
+---
 
-The GRUB theme is installed from [`Anto426-grub-theme`](https://github.com/Anto426/Anto426-grub-theme), a single `anto426` theme aligned with the Riva controls. You can set `ANTO426_GRUB_SCREEN=2k`, `ANTO426_GRUB_SCREEN=4k`, or `ANTO426_GRUB_RESOLUTION=3440x1440` before running `install.sh` if the default 1080p GRUB layout is not right for the machine.
+## 🎨 Theme Repos
 
-## Inspirations
+- 🖌️ **GTK Base Theme**: Installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
+- 🗂️ **GRUB Theme**: Installed from [`grub2-themes`](https://github.com/Anto426/grub2-themes), a single `anto426` theme aligned with the Riva controls.
+  - You can customize before running `install.sh` if the default 1080p layout is not right for your machine:
+    - `ANTO426_GRUB_SCREEN=2k` or `4k`
+    - `ANTO426_GRUB_RESOLUTION=3440x1440` (for custom ultrawide)
+
+---
+
+## 🌌 Inspirations
+
 I drew inspiration from the following projects and communities:
 
-- https://www.reddit.com/r/unixporn/
-- https://github.com/JaKooLit/Hyprland-Dots
-- https://github.com/Hyde-project/hyde
-- https://github.com/mylinuxforwork/dotfiles
+- [r/unixporn](https://www.reddit.com/r/unixporn/)
+- [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots)
+- [Hyde-project/hyde](https://github.com/Hyde-project/hyde)
+- [mylinuxforwork/dotfiles](https://github.com/mylinuxforwork/dotfiles)
 
 and more...
 
-## Feedback
-If you find this repo useful or have any suggestions, feel free to open an issue or submit a pull request. Happy ricing! 🍚
+---
+
+<div align="center">
+  <i>Configured by anto426</i>
+</div>
