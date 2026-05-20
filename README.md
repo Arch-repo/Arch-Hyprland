@@ -56,9 +56,18 @@ You can find the desktop wallpapers and Fastfetch terminal images in: [`Wallpape
 The installer copies `Wallpapers/` to `~/Pictures/Wallpapers` and `neofetch/` to `~/Pictures/neofetch`. You can later point the dotfiles sync config to Google Drive or another local folder via `~/.local/share/anto426/sync.env`.
 
 ## Theme Repos
+The installer uses these repo variables and checks that existing cached clones point to the expected remote before pulling:
+
+```bash
+DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
+WALLPAPER_REPO=https://github.com/Anto426/Wallpaper-Collection.git
+ANTO_THEME_REPO=https://github.com/Anto426/Anto426-theme.git
+ANTO_GRUB_THEME_REPO=https://github.com/Anto426/Anto426-grub-theme.git
+```
+
 The GTK base theme is installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
 
-The GRUB theme is installed from [`Anto426-grub-theme`](https://github.com/Anto426/Anto426-grub-theme), a tuned fork of vinceliuice/grub2-themes with an `anto426` variant. You can set `ANTO426_GRUB_SCREEN=2k`, `ANTO426_GRUB_SCREEN=4k`, or `ANTO426_GRUB_RESOLUTION=3440x1440` before running `install.sh` if the default 1080p GRUB layout is not right for the machine.
+The GRUB theme is installed from [`Anto426-grub-theme`](https://github.com/Anto426/Anto426-grub-theme), a single `anto426` theme aligned with the Riva controls. You can set `ANTO426_GRUB_SCREEN=2k`, `ANTO426_GRUB_SCREEN=4k`, or `ANTO426_GRUB_RESOLUTION=3440x1440` before running `install.sh` if the default 1080p GRUB layout is not right for the machine.
 
 ## Inspirations
 I drew inspiration from the following projects and communities:

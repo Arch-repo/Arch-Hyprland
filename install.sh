@@ -15,6 +15,7 @@ GREEN="\e[32m"
 BLUE="\e[34m"
 
 AUTO_SETUP_URL="${AUTO_SETUP_URL:-https://raw.githubusercontent.com/Anto426/auto-setup-LT/main/arch.sh}"
+DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Anto426/dotfiles.git}"
 WALLPAPER_REPO="${WALLPAPER_REPO:-https://github.com/Anto426/Wallpaper-Collection.git}"
 ANTO_THEME_REPO="${ANTO_THEME_REPO:-https://github.com/Anto426/Anto426-theme.git}"
 ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Anto426/Anto426-grub-theme.git}"
@@ -86,7 +87,17 @@ clone_or_update_repo() {
     local target="$2"
 
     if [[ -d "$target/.git" ]]; then
-        git -C "$target" pull --ff-only || true
+        local current_remote
+        current_remote="$(git -C "$target" remote get-url origin 2>/dev/null || true)"
+
+        if [[ "$current_remote" == "$repo" ]]; then
+            git -C "$target" pull --ff-only || true
+        else
+            local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
+            mv "$target" "$backup"
+            echo -e "${BLUE}[NOTE]${PINK} ==> Existing $target remote differs, moved to $backup"
+            git clone --depth 1 "$repo" "$target"
+        fi
     elif [[ -e "$target" ]]; then
         local backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
         mv "$target" "$backup"
@@ -95,6 +106,10 @@ clone_or_update_repo() {
     else
         git clone --depth 1 "$repo" "$target"
     fi
+}
+
+install_dotfiles_repo() {
+    clone_or_update_repo "$DOTFILES_REPO" "$DOTFILES_DIR"
 }
 
 install_anto426_theme() {
@@ -120,10 +135,21 @@ install_anto426_grub_theme() {
 
     (
         cd "$GRUB_THEME_BUILD_DIR"
+        local grub_args=(-t anto426 -i color)
+
+        if [[ -n "${ANTO426_GRUB_RESOLUTION:-}" ]]; then
+            grub_args+=(-c "$ANTO426_GRUB_RESOLUTION")
+        else
+            grub_args+=(-s "${ANTO426_GRUB_SCREEN:-1080p}")
+        fi
+
+        if [[ "${ANTO426_GRUB_BOOT:-0}" == "1" ]]; then
+            grub_args+=(-b)
+        fi
+
         if [[ -f ./install-anto426.sh ]]; then
             local sudo_env=(
                 "ANTO426_GRUB_SCREEN=${ANTO426_GRUB_SCREEN:-1080p}"
-                "ANTO426_GRUB_ICON=${ANTO426_GRUB_ICON:-color}"
                 "ANTO426_GRUB_BOOT=${ANTO426_GRUB_BOOT:-0}"
             )
 
@@ -133,7 +159,7 @@ install_anto426_grub_theme() {
 
             sudo env "${sudo_env[@]}" bash ./install-anto426.sh
         else
-            sudo bash ./install.sh -t anto426 -i color -s "${ANTO426_GRUB_SCREEN:-1080p}"
+            sudo bash ./install.sh "${grub_args[@]}"
         fi
     )
 }
@@ -149,7 +175,7 @@ run_auto_setup() {
     setup_script="$(mktemp)"
 
     curl -fSL "$AUTO_SETUP_URL" -o "$setup_script"
-    bash "$setup_script"
+    DOTFILES_REPO="$DOTFILES_REPO" bash "$setup_script"
     rm -f "$setup_script"
 }
 
@@ -233,6 +259,7 @@ sudo pacman -Syu --noconfirm
 echo -e "${PINK}\n---------------------------------------------------------------------\n${YELLOW}[2/11]${PINK} ==> Setup terminal\n---------------------------------------------------------------------\n${WHITE}"
 sleep 0.5
 run_auto_setup
+install_dotfiles_repo
 ensure_dotfiles_ready
 
 # Make all dotfiles scripts executable
