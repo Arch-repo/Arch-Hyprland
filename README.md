@@ -61,6 +61,7 @@ DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
 WALLPAPER_REPO=https://github.com/Anto426/Wallpaper-Collection.git
 ANTO_THEME_REPO=https://github.com/Anto426/Anto426-theme.git
 ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
+ANTO_VSCODE_THEME_REPO=https://github.com/Anto426/vscodetheme.git
 ANTO426_ROFI_REPO=https://github.com/Anto426/rofi
 ```
 
@@ -70,6 +71,7 @@ ANTO426_ROFI_REPO=https://github.com/Anto426/rofi
 
 - 🖌️ **GTK Base Theme**: Installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
 - 🎛️ **Custom Rofi**: Installed from [`rofi`](https://github.com/Anto426/rofi) so the control menus can use the slider widget.
+- 🧩 **VSCode Theme**: Installed from [`vscodetheme`](https://github.com/Anto426/vscodetheme), exposing only `Anto426 Rofi Dynamic` and regenerated from the wallpaper palette.
 - 🗂️ **GRUB Theme**: Installed from [`grub2-themes`](https://github.com/Anto426/grub2-themes), a single `anto426` theme aligned with the Riva controls.
   - The Arch installer auto-detects the active display resolution for GRUB. You can still override it before running `install.sh`:
     - `ANTO426_GRUB_SCREEN=2k` or `4k`

@@ -80,10 +80,12 @@ DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Anto426/dotfiles.git}"
 WALLPAPER_REPO="${WALLPAPER_REPO:-https://github.com/Anto426/Wallpaper-Collection.git}"
 ANTO_THEME_REPO="${ANTO_THEME_REPO:-https://github.com/Anto426/Anto426-theme.git}"
 ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Anto426/grub2-themes.git}"
+ANTO_VSCODE_THEME_REPO="${ANTO_VSCODE_THEME_REPO:-https://github.com/Anto426/vscodetheme.git}"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 ANTO_CONFIG_DIR="$DOTFILES_DIR/.config/anto426"
 THEME_BUILD_DIR="${THEME_BUILD_DIR:-$HOME/.cache/anto426-theme}"
 GRUB_THEME_BUILD_DIR="${GRUB_THEME_BUILD_DIR:-$HOME/.cache/anto426-grub-theme}"
+VSCODE_THEME_BUILD_DIR="${VSCODE_THEME_BUILD_DIR:-$HOME/.cache/anto426-vscode-theme}"
 
 pacman_packages=(
     # Hyprland & Wayland environment
@@ -96,7 +98,7 @@ pacman_packages=(
     pipewire pipewire-pulse wireplumber pavucontrol
 
     # Apps used by the dotfiles
-    ghostty nemo gvfs curl jq python python-gobject gtk3 htop loupe celluloid gnome-text-editor evince
+    ghostty nemo gvfs curl jq git base-devel nodejs npm yarn python python-gobject gtk3 htop loupe celluloid gnome-text-editor evince
     ffmpeg cava cliphist gnome-characters keepass playerctl wev
 
     # Qt, display manager, and theming
@@ -389,6 +391,85 @@ install_anto426_grub_theme() {
     )
 }
 
+find_vscode_cli() {
+    local cli
+
+    for cli in code codium code-insiders; do
+        if command -v "$cli" >/dev/null 2>&1; then
+            printf '%s\n' "$cli"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+copy_vscode_theme_extension() {
+    local source_dir="$1"
+    local extension_dir="$HOME/.vscode/extensions/anto426.anto426-vscode-theme-dynamic"
+
+    install -d -m 755 "$extension_dir" "$extension_dir/themes"
+    cp -f "$source_dir/package.json" "$extension_dir/package.json"
+    [[ -f "$source_dir/icon.png" ]] && cp -f "$source_dir/icon.png" "$extension_dir/icon.png"
+    [[ -d "$source_dir/themes" ]] && cp -rf "$source_dir/themes/." "$extension_dir/themes/"
+
+    if [[ -d "$source_dir/out" ]]; then
+        install -d -m 755 "$extension_dir/out"
+        cp -rf "$source_dir/out/." "$extension_dir/out/"
+    fi
+
+    if [[ -d "$source_dir/styles" ]]; then
+        install -d -m 755 "$extension_dir/styles"
+        cp -rf "$source_dir/styles/." "$extension_dir/styles/"
+    fi
+
+    ui_ok "VSCode theme copied to $extension_dir."
+}
+
+install_anto426_vscode_theme() {
+    clone_or_update_repo "$ANTO_VSCODE_THEME_REPO" "$VSCODE_THEME_BUILD_DIR"
+
+    (
+        cd "$VSCODE_THEME_BUILD_DIR"
+
+        local yarn_cmd=(yarn)
+        local vscode_cli=""
+        local vsix=""
+
+        if ! command -v yarn >/dev/null 2>&1; then
+            if command -v corepack >/dev/null 2>&1; then
+                corepack enable >/dev/null 2>&1 || true
+                yarn_cmd=(corepack yarn)
+            else
+                ui_warn "yarn/corepack not found, skipping VSCode theme build."
+                return 0
+            fi
+        fi
+
+        "${yarn_cmd[@]}" install --frozen-lockfile || "${yarn_cmd[@]}" install
+        "${yarn_cmd[@]}" build
+
+        if "${yarn_cmd[@]}" package; then
+            vsix="$(find "$VSCODE_THEME_BUILD_DIR" -maxdepth 1 -type f -name 'anto426-vscode-theme-*.vsix' | sort -V | tail -n 1)"
+        fi
+
+        if [[ -n "$vsix" ]] && vscode_cli="$(find_vscode_cli)"; then
+            if "$vscode_cli" --install-extension "$vsix" --force; then
+                ui_ok "Anto426 VSCode theme installed through $vscode_cli."
+                return 0
+            fi
+
+            ui_warn "VSCode CLI install failed, using local extension fallback."
+        elif [[ -z "$vsix" ]]; then
+            ui_warn "VSIX package not found, using local extension fallback."
+        else
+            ui_note "VSCode CLI not found, using local extension fallback."
+        fi
+
+        copy_vscode_theme_extension "$VSCODE_THEME_BUILD_DIR"
+    )
+}
+
 setup_dynamic_theme_permissions() {
     if [[ -x "$ANTO_CONFIG_DIR/wallpaper_effects.sh" ]]; then
         sudo ANTO426_ADMIN_USER="$(id -un)" "$ANTO_CONFIG_DIR/wallpaper_effects.sh" --setup-admin || true
@@ -506,6 +587,56 @@ install_assets() {
     rm -rf "$assets_dir"
 }
 
+find_initial_wallpaper() {
+    local candidate
+    local wallpaper_dir="${ANTO426_WALLPAPERS_DIR:-$HOME/Pictures/Wallpapers}"
+
+    if command -v awww >/dev/null 2>&1; then
+        candidate="$(awww query 2>/dev/null | awk -F'image: ' '/image:/ {print $2; exit}')"
+        if [[ -n "$candidate" && -f "$candidate" ]]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    fi
+
+    if [[ -f "$HOME/.cache/awww/current-wallpaper.path" ]]; then
+        candidate="$(<"$HOME/.cache/awww/current-wallpaper.path")"
+        if [[ -n "$candidate" && -f "$candidate" ]]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    fi
+
+    find "$wallpaper_dir" -maxdepth 3 -type f \
+        \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.webp" \) 2>/dev/null |
+        sort -f |
+        head -n 1 || true
+}
+
+apply_initial_dynamic_theme() {
+    local effects_script="$HOME/.config/anto426/wallpaper_effects.sh"
+    local wallpaper
+
+    if [[ ! -x "$effects_script" ]]; then
+        ui_note "Dynamic theme script not found after stow, skipping initial color generation."
+        return 0
+    fi
+
+    wallpaper="$(find_initial_wallpaper || true)"
+
+    if [[ -z "$wallpaper" || ! -f "$wallpaper" ]]; then
+        ui_note "No wallpaper found for initial color generation."
+        return 0
+    fi
+
+    "$effects_script" "$wallpaper" || {
+        ui_warn "Initial dynamic color generation failed for $wallpaper."
+        return 0
+    }
+
+    ui_ok "Initial dynamic colors generated from $(basename "$wallpaper")."
+}
+
 init_dotfiles_sync_config() {
     if [[ -x "$ANTO_CONFIG_DIR/remote_sync.sh" ]]; then
         ANTO426_SYNC_QUIET=1 "$ANTO_CONFIG_DIR/remote_sync.sh" init || true
@@ -531,44 +662,45 @@ esac
 cd ~
 
 # Full system update
-ui_step 1 11 "Updating system packages"
+ui_step 1 12 "Updating system packages"
 sudo pacman -Syu --noconfirm
 
 # Launch auto-setup script and download all the dotfiles
-ui_step 2 11 "Setting up terminal and dotfiles"
+ui_step 2 12 "Setting up terminal and dotfiles"
 sleep 0.5
 run_auto_setup
 install_dotfiles_repo
 ensure_dotfiles_ready
 
 # Make all dotfiles scripts executable
-ui_step 3 11 "Making dotfiles scripts executable"
+ui_step 3 12 "Making dotfiles scripts executable"
 find "$ANTO_CONFIG_DIR" -type f -name "*.sh" -exec chmod +x {} +
 
 # Download wallpapers and terminal images
-ui_step 4 11 "Downloading wallpapers and terminal assets"
+ui_step 4 12 "Downloading wallpapers and terminal assets"
 install_assets
 init_dotfiles_sync_config
 
 # Install the required packages
-ui_step 5 11 "Installing packages and themes"
+ui_step 5 12 "Installing packages and themes"
 sleep 0.5
 install_hyprland_packages
 build_anto426_rofi
 install_anto426_theme
 install_anto426_grub_theme
+install_anto426_vscode_theme
 setup_dynamic_theme_permissions
 "$ANTO_CONFIG_DIR/gtkthemes.sh" || true
 
 # enable bluetooth & networkmanager
-ui_step 6 11 "Enabling Bluetooth and NetworkManager"
+ui_step 6 12 "Enabling Bluetooth and NetworkManager"
 sleep 0.5
 sudo systemctl enable --now bluetooth
 sudo systemctl enable --now NetworkManager
 configure_power_button_policy
 
 # Set Ghostty as default terminal emulator for Nemo
-ui_step 7 11 "Setting Ghostty as Nemo terminal"
+ui_step 7 12 "Setting Ghostty as Nemo terminal"
 if command -v gsettings >/dev/null 2>&1 &&
     [[ "$(gsettings writable org.cinnamon.desktop.default-applications.terminal exec 2>/dev/null)" == "true" ]]; then
     gsettings set org.cinnamon.desktop.default-applications.terminal exec ghostty
@@ -577,21 +709,25 @@ else
 fi
 
 # Apply fonts
-ui_step 8 11 "Refreshing font cache"
+ui_step 8 12 "Refreshing font cache"
 fc-cache -fv
 
 # Set cursor
-ui_step 9 11 "Applying cursor theme"
+ui_step 9 12 "Applying cursor theme"
 "$ANTO_CONFIG_DIR/setcursor.sh"
 
 # Stow
-ui_step 10 11 "Stowing dotfiles"
+ui_step 10 12 "Stowing dotfiles"
 cd "$DOTFILES_DIR"
 stow -t ~ .
 cd ~
 
+# Generate initial dynamic colors after the dotfiles symlinks exist
+ui_step 11 12 "Generating initial dynamic colors"
+apply_initial_dynamic_theme
+
 # Setup display manager
-ui_step 11 11 "Configuring SDDM display manager"
+ui_step 12 12 "Configuring SDDM display manager"
 configure_hyprland_session
 configure_sddm
 
