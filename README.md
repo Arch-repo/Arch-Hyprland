@@ -41,8 +41,7 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
   <img src="./previews/screenshot.png" width="90%" alt="Arch-Hyprland Active Setup Screenshot" />
 </p>
 
-https://github.com/Anto426/Arch-Hyprland/raw/main/previews/demo.mp4
-
+![Ecosystem Demo Video](https://github.com/Anto426/Arch-Hyprland/raw/main/previews/demo.mp4)
 
 
 <p align="center">
