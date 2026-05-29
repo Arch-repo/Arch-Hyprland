@@ -45,7 +45,7 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 </p>
 
 <p align="center">
-  <a href="https://github.com/Anto426/Arch-Hyprland/blob/main/previews/demo.mp4">
+  <a href="https://github.com/Arch-repo/Arch-Hyprland/blob/main/previews/demo.mp4">
     <img src="https://img.shields.io/badge/▶%20WATCH%20FULL%20HD%20VIDEO-8cb8e4?style=for-the-badge&logo=youtube&logoColor=white" height="40" alt="Watch Full HD Video" />
   </a>
 </p>
@@ -64,7 +64,7 @@ Use this script to clone and install the environment on a clean Arch-based syste
 ```
 
 ```bash
-git clone --depth=1 https://github.com/Anto426/Arch-Hyprland.git
+git clone --depth=1 https://github.com/Arch-repo/Arch-Hyprland.git
 cd ~/Arch-Hyprland
 chmod +x install.sh
 ./install.sh
@@ -75,20 +75,20 @@ chmod +x install.sh
 The installer manages and updates the following upstream targets:
 
 ```bash
-DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
-WALLPAPER_REPO=https://github.com/Anto426/Wallpaper-Collection.git
-ANTO_THEME_REPO=https://github.com/Anto426/Anto426-theme.git
-ANTO_GRUB_THEME_REPO=https://github.com/Anto426/grub2-themes.git
-ANTO_VSCODE_THEME_REPO=https://github.com/Anto426/vscodetheme.git
-ANTO426_ROFI_REPO=https://github.com/Anto426/rofi
+DOTFILES_REPO=https://github.com/Arch-repo/dotfiles.git
+WALLPAPER_REPO=https://github.com/Arch-repo/Wallpaper-Collection.git
+ANTO_THEME_REPO=https://github.com/Arch-repo/Anto426-theme.git
+ANTO_GRUB_THEME_REPO=https://github.com/Arch-repo/grub2-themes.git
+ANTO_VSCODE_THEME_REPO=https://github.com/Arch-repo/vscodetheme.git
+ANTO426_ROFI_REPO=https://github.com/Arch-repo/rofi
 ```
 
 ### 🎨 Integrated Sub-Themes
 
-- 🖌️ **GTK Base Theme**: [`Anto426-theme`](https://github.com/Anto426/Anto426-theme) stable Orchard fork primary base.
-- 🎛️ **Custom Rofi Menu**: [`rofi`](https://github.com/Anto426/rofi) Wayland fork enabling sliders.
-- 🧩 **VSCode Integration**: [`vscodetheme`](https://github.com/Anto426/vscodetheme) exposing the dynamic theme file.
-- 🗂️ **Boot Customization**: [`grub2-themes`](https://github.com/Anto426/grub2-themes) specializing in high DPI/resolution boots.
+- 🖌️ **GTK Base Theme**: [`Anto426-theme`](https://github.com/Arch-repo/Anto426-theme) stable Orchard fork primary base.
+- 🎛️ **Custom Rofi Menu**: [`rofi`](https://github.com/Arch-repo/rofi) Wayland fork enabling sliders.
+- 🧩 **VSCode Integration**: [`vscodetheme`](https://github.com/Arch-repo/vscodetheme) exposing the dynamic theme file.
+- 🗂️ **Boot Customization**: [`grub2-themes`](https://github.com/Arch-repo/grub2-themes) specializing in high DPI/resolution boots.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
@@ -112,3 +112,4 @@ root@anto426: ~/arch-hyprland (main⚡)$ cat inspirations.log
 <div align="center">
   <i>Configured by anto426</i>
 </div>
+

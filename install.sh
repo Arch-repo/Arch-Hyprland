@@ -76,11 +76,11 @@ ui_done() {
 }
 
 AUTO_SETUP_URL="${AUTO_SETUP_URL:-https://raw.githubusercontent.com/Anto426/auto-setup-LT/main/arch.sh}"
-DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Anto426/dotfiles.git}"
-WALLPAPER_REPO="${WALLPAPER_REPO:-https://github.com/Anto426/Wallpaper-Collection.git}"
-ANTO_THEME_REPO="${ANTO_THEME_REPO:-https://github.com/Anto426/Anto426-theme.git}"
-ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Anto426/grub2-themes.git}"
-ANTO_VSCODE_THEME_REPO="${ANTO_VSCODE_THEME_REPO:-https://github.com/Anto426/vscodetheme.git}"
+DOTFILES_REPO="${DOTFILES_REPO:-https://github.com/Arch-repo/dotfiles.git}"
+WALLPAPER_REPO="${WALLPAPER_REPO:-https://github.com/Arch-repo/Wallpaper-Collection.git}"
+ANTO_THEME_REPO="${ANTO_THEME_REPO:-https://github.com/Arch-repo/Anto426-theme.git}"
+ANTO_GRUB_THEME_REPO="${ANTO_GRUB_THEME_REPO:-https://github.com/Arch-repo/grub2-themes.git}"
+ANTO_VSCODE_THEME_REPO="${ANTO_VSCODE_THEME_REPO:-https://github.com/Arch-repo/vscodetheme.git}"
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 ANTO_CONFIG_DIR="$DOTFILES_DIR/.config/anto426"
 THEME_BUILD_DIR="${THEME_BUILD_DIR:-$HOME/.cache/anto426-theme}"
@@ -158,7 +158,7 @@ build_anto426_rofi() {
     fi
 
     local rofi_src="${ANTO426_ROFI_SRC:-$HOME/Git/arch/rofi}"
-    local rofi_repo="${ANTO426_ROFI_REPO:-https://github.com/Anto426/rofi}"
+    local rofi_repo="${ANTO426_ROFI_REPO:-https://github.com/Arch-repo/rofi}"
     local build_dir="${ANTO426_ROFI_BUILD_DIR:-$rofi_src/build-anto426}"
     local prefix="${ANTO426_ROFI_PREFIX:-/usr}"
 
@@ -744,3 +744,4 @@ printf -v minutes "%02d" "$minutes"
 printf -v seconds "%02d" "$seconds"
 
 ui_done "$duration" "$hours" "$minutes" "$seconds"
+
