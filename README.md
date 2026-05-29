@@ -1,47 +1,59 @@
-<div align="center">
+<p align="center">
+  <img 
+    src="https://wsrv.nl/?url=avatars.githubusercontent.com/u/87477585?v=5&w=300&h=300&mask=circle&fit=cover" 
+    width="150"
+  />
+</p>
 
-# 🚀 anto426 Arch-Hyprland
+<p align="center">
+  <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=24&duration=3000&pause=1000&color=8cb8e4&center=true&vCenter=true&width=500&height=80&lines=Arch+Hyprland+Installer;Aesthetic+Wayland+Install;Automatic+Deployment" alt="Typing SVG" /></a>
+</p>
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=28&duration=3000&pause=1000&color=8cb8e4&center=true&vCenter=true&width=435&lines=Arch+Hyprland+Setup;Aesthetic+Wayland+Install;Automatic+Deployment)](https://git.io/typing-svg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
+
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon.gif" width="60px" /> About;
+
+```sh
+root@anto426: ~/arch-hyprland (main⚡)$ cat info.txt
 
 A beautiful, automated installer to deploy a complete Wayland/Hyprland desktop ecosystem on Arch Linux.
+This repository acts as the central bootstrapper, pulling down all aesthetic custom assets, custom themes,
+dotfiles, and terminal packages to deliver a cohesive and jaw-dropping workspace right after login.
+```
 
-</div>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
----
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon2.gif" width="70px" /> Preview & Notes;
 
-## ✨ Preview
+```sh
+root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 
-> [!NOTE]
-> Previews, screenshots, and setup demonstration videos are currently **to be uploaded** (*ancora da caricare*).
+> Previews & Screenshots:
+  - 📽️ Demo Videos: [⏳ coming soon / ancora da caricare]
+  - 📸 Screenshots: [⏳ coming soon / ancora da caricare]
 
-### 📽️ Videos
-- ⏳ *Demo video coming soon (to be uploaded)*
+> Important System Notes:
+  - ⚠️ Backup system beforehand; use on a clean minimal profile.
+  - 🚫 Script does not uninstall packages to safeguard existing user setups.
+  - 💡 Physical power button is configured to be ignored by systemd-logind.
+  - ⌨️ Keybinding Hint: Press [SUPER + H] to open interactive bindings menu.
+```
 
-### 📸 Screenshots
-- ⏳ *Setup screenshots coming soon (to be uploaded)*
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
----
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon3.gif" width="70px" /> Installation;
 
-## 📝 Important Notes
+```sh
+root@anto426: ~/arch-hyprland (main⚡)$ ./install.sh --help
 
-> [!IMPORTANT]
-> This script automates the installation and setup of my Arch Hyprland environment.
-> - If you want to try it, you should use a minimal profile and backup your system beforehand.
-
-> [!NOTE]
-> This script does not include package uninstallation, as some packages may already exist on your system by default. Creating an uninstallation script could potentially affect your current setup.
-> Non-essential entertainment apps are not installed by the base setup.
-> The installer also sets the physical power button to be ignored by systemd-logind to avoid accidental shutdowns.
-
-### ⌨️ Keybinding Hint
-Press `SUPER + H` (Windows + H) to open the interactive keybinding hints.
-
----
-
-## ⚙️ Installation
-
-Use this script to install Hyprland on a clean Arch-based system:
+Use this script to clone and install the environment on a clean Arch-based system:
+```
 
 ```bash
 git clone --depth=1 https://github.com/Anto426/Arch-Hyprland.git
@@ -50,11 +62,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
----
+### 📂 Repository Targets
 
-## 📂 Repository Variables
-
-The installer uses these repo variables and checks that existing cached clones point to the expected remote before pulling:
+The installer manages and updates the following upstream targets:
 
 ```bash
 DOTFILES_REPO=https://github.com/Anto426/dotfiles.git
@@ -65,32 +75,31 @@ ANTO_VSCODE_THEME_REPO=https://github.com/Anto426/vscodetheme.git
 ANTO426_ROFI_REPO=https://github.com/Anto426/rofi
 ```
 
----
+### 🎨 Integrated Sub-Themes
 
-## 🎨 Theme Repos
+- 🖌️ **GTK Base Theme**: [`Anto426-theme`](https://github.com/Anto426/Anto426-theme) stable Orchard fork primary base.
+- 🎛️ **Custom Rofi Menu**: [`rofi`](https://github.com/Anto426/rofi) Wayland fork enabling sliders.
+- 🧩 **VSCode Integration**: [`vscodetheme`](https://github.com/Anto426/vscodetheme) exposing the dynamic theme file.
+- 🗂️ **Boot Customization**: [`grub2-themes`](https://github.com/Anto426/grub2-themes) specializing in high DPI/resolution boots.
 
-- 🖌️ **GTK Base Theme**: Installed from [`Anto426-theme`](https://github.com/Anto426/Anto426-theme), a tuned fork of Orchis used as the stable base for the dynamic color engine.
-- 🎛️ **Custom Rofi**: Installed from [`rofi`](https://github.com/Anto426/rofi) so the control menus can use the slider widget.
-- 🧩 **VSCode Theme**: Installed from [`vscodetheme`](https://github.com/Anto426/vscodetheme), exposing only `Anto426 Rofi Dynamic` and regenerated from the wallpaper palette.
-- 🗂️ **GRUB Theme**: Installed from [`grub2-themes`](https://github.com/Anto426/grub2-themes), a single `anto426` theme aligned with the Riva controls.
-  - The Arch installer auto-detects the active display resolution for GRUB. You can still override it before running `install.sh`:
-    - `ANTO426_GRUB_SCREEN=2k` or `4k`
-    - `ANTO426_GRUB_RESOLUTION=3440x1440` (for custom ultrawide)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
----
+# <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/icon4.gif" width="70px" /> Inspirations;
 
-## 🌌 Inspirations
+```sh
+root@anto426: ~/arch-hyprland (main⚡)$ cat inspirations.log
 
-I drew inspiration from the following projects and communities:
+- r/unixporn community styling
+- JaKooLit/Hyprland-Dots structures
+- Hyde-project/hyde wallpaper generation ideas
+- mylinuxforwork/dotfiles packages and scripts
+```
 
-- [r/unixporn](https://www.reddit.com/r/unixporn/)
-- [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots)
-- [Hyde-project/hyde](https://github.com/Hyde-project/hyde)
-- [mylinuxforwork/dotfiles](https://github.com/mylinuxforwork/dotfiles)
-
-and more...
-
----
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
+</p>
 
 <div align="center">
   <i>Configured by anto426</i>
