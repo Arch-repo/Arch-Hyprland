@@ -431,13 +431,14 @@ EOF
 
     if [[ -z "$active_display_manager" ]]; then
         sudo systemctl enable sddm.service
-        ui_ok "SDDM has been enabled."
+        ui_ok "SDDM has been enabled for the next boot."
     elif [[ "$active_display_manager" == */sddm.service ]]; then
         sudo systemctl enable sddm.service >/dev/null 2>&1 || true
         ui_ok "SDDM is already the active display manager."
     else
         ui_note "Another display manager is active: $active_display_manager"
-        ui_note "Leaving it enabled. Run 'sudo systemctl disable --now display-manager && sudo systemctl enable sddm' to switch manually."
+        ui_note "Leaving it enabled to avoid interrupting the current session."
+        ui_note "After reboot, switch manually with: sudo systemctl disable display-manager && sudo systemctl enable sddm"
     fi
 }
 
@@ -452,8 +453,8 @@ configure_power_button_policy() {
         'HandlePowerKeyLongPress=ignore' |
         sudo tee "$logind_file" >/dev/null
 
-    sudo systemctl restart systemd-logind.service || true
     ui_ok "Power button configured to avoid accidental shutdown."
+    ui_note "systemd-logind was not restarted, so the current graphical session stays alive. Reboot to apply this policy."
 }
 
 run_auto_setup() {
