@@ -158,7 +158,7 @@ build_anto426_rofi() {
     local rofi_src="${ANTO426_ROFI_SRC:-$HOME/Git/arch/rofi}"
     local rofi_repo="${ANTO426_ROFI_REPO:-https://github.com/Anto426/rofi}"
     local build_dir="${ANTO426_ROFI_BUILD_DIR:-$rofi_src/build-anto426}"
-    local prefix="${ANTO426_ROFI_PREFIX:-$HOME/.local/rofi-anto426}"
+    local prefix="${ANTO426_ROFI_PREFIX:-/usr}"
 
     if [[ ! -d "$rofi_src/.git" ]]; then
         echo -e "${BLUE}[NOTE]${PINK} ==> Cloning Anto426 rofi into $rofi_src"
@@ -179,13 +179,24 @@ build_anto426_rofi() {
     fi
 
     meson compile -C "$build_dir"
-    meson install -C "$build_dir"
+    sudo meson install -C "$build_dir"
 
-    mkdir -p "$HOME/.local/bin"
-    ln -sfn "$prefix/bin/rofi" "$HOME/.local/bin/rofi"
+    # Clean up old local build if it exists
+    rm -rf "$HOME/.local/rofi-anto426"
+    rm -f "$HOME/.local/bin/rofi"
 
-    if "$HOME/.local/bin/rofi" -help 2>&1 | grep -Fq -- "-slider-change-command"; then
-        echo -e "${GREEN}[OK]${PINK} ==> Anto426 rofi installed with slider support."
+    # Prevent future system updates from overwriting the custom build
+    if ! grep -q "^IgnorePkg.*=.*rofi" /etc/pacman.conf; then
+        echo -e "${BLUE}[NOTE]${PINK} ==> Adding rofi to IgnorePkg in /etc/pacman.conf..."
+        if grep -q "^#IgnorePkg" /etc/pacman.conf; then
+            sudo sed -i 's/^#IgnorePkg\s*=/IgnorePkg = rofi/' /etc/pacman.conf
+        else
+            sudo sed -i '/\[options\]/a IgnorePkg = rofi' /etc/pacman.conf
+        fi
+    fi
+
+    if "/usr/bin/rofi" -help 2>&1 | grep -Fq -- "-slider-change-command"; then
+        echo -e "${GREEN}[OK]${PINK} ==> Anto426 rofi installed system-wide with slider support."
     else
         echo -e "${BLUE}[NOTE]${PINK} ==> Anto426 rofi installed, but slider dmenu option was not detected."
     fi
