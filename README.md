@@ -40,8 +40,15 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 <p align="center">
   <img src="./previews/screenshot.png" width="90%" alt="Arch-Hyprland Active Setup Screenshot" />
 </p>
+<p align="center">
+  <img src="./previews/demo.gif" width="90%" alt="Arch-Hyprland Live Animated Preview" />
+</p>
 
-<https://github.com/Anto426/Arch-Hyprland/raw/main/previews/demo.mp4>
+<p align="center">
+  <a href="https://github.com/Anto426/Arch-Hyprland/blob/main/previews/demo.mp4">
+    <img src="https://img.shields.io/badge/▶%20WATCH%20FULL%20HD%20VIDEO-8cb8e4?style=for-the-badge&logo=youtube&logoColor=white" height="40" alt="Watch Full HD Video" />
+  </a>
+</p>
 
 
 <p align="center">
