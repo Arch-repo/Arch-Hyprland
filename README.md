@@ -42,7 +42,7 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 </p>
 
 <p align="center">
-  <video src="./previews/demo.mp4" width="90%" controls></video>
+  ![Ecosystem Demo Video](https://github.com/Anto426/Arch-Hyprland/raw/main/previews/demo.mp4)
 </p>
 
 
