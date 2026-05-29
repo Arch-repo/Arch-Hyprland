@@ -27,8 +27,8 @@ dotfiles, and terminal packages to deliver a cohesive and jaw-dropping workspace
 root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 
 > Previews & Screenshots:
-  - 📽️ Demo Videos: [⏳ coming soon / ancora da caricare]
-  - 📸 Screenshots: [⏳ coming soon / ancora da caricare]
+  - 📽️ Demo Video: [🎞️ Watch previews/demo.mkv](./previews/demo.mkv)
+  - 📸 Screenshot: Active setup loaded successfully.
 
 > Important System Notes:
   - ⚠️ Backup system beforehand; use on a clean minimal profile.
@@ -36,6 +36,11 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
   - 💡 Physical power button is configured to be ignored by systemd-logind.
   - ⌨️ Keybinding Hint: Press [SUPER + H] to open interactive bindings menu.
 ```
+
+<p align="center">
+  <img src="./previews/screenshot.png" width="90%" alt="Arch-Hyprland Active Setup Screenshot" />
+</p>
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/Anto426/Anto426/main/asset/divider.gif" width="440" height="40" />
