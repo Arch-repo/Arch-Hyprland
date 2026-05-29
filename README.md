@@ -27,7 +27,7 @@ dotfiles, and terminal packages to deliver a cohesive and jaw-dropping workspace
 root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 
 > Previews & Screenshots:
-  - 📽️ Demo Video: [🎞️ Watch previews/demo.mkv](./previews/demo.mkv)
+  - 📽️ Demo Video: Playback player loaded below.
   - 📸 Screenshot: Active setup loaded successfully.
 
 > Important System Notes:
@@ -39,6 +39,10 @@ root@anto426: ~/arch-hyprland (main⚡)$ preview --status
 
 <p align="center">
   <img src="./previews/screenshot.png" width="90%" alt="Arch-Hyprland Active Setup Screenshot" />
+</p>
+
+<p align="center">
+  <video src="./previews/demo.mp4" width="90%" controls></video>
 </p>
 
 
